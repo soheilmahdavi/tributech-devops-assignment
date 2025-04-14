@@ -1,0 +1,15 @@
+dependencies:
+- name: keycloak
+  repository: https://charts.bitnami.com/bitnami
+  version: 15.0.3
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.1.7
+- name: pgadmin4
+  repository: https://helm.runix.net
+  version: 1.5.1
+- name: website
+  repository: file://charts/website
+  version: 0.1.0
+digest: sha256:273a997819ea4fe59947cda09221128af1b63168945c1cc2a991b495936109c6
+generated: "2025-04-14T20:03:37.326564718+02:00"

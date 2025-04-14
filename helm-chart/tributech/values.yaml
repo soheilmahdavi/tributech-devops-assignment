@@ -1,0 +1,68 @@
+serviceAccount:
+    create: true
+    name: ""
+
+service:
+    type: ClusterIP
+    port: 80
+
+ingress:
+    enabled: false
+
+autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+
+keycloak:
+  ingress:
+    enabled: true
+    hostname: keycloak-dev.local
+
+postgresql:
+  auth:
+    username: keycloak
+    password: keycloakpassword
+    database: keycloakdb
+
+pgadmin:
+  ingress:
+    enabled: true
+    annotations: {}
+    hosts:
+      - host: pgadmin.local
+        paths:
+          - path: /
+            pathType: Prefix
+  admin:
+    email: admin@example.com
+    password: adminpassword
+
+website:
+  image:
+    repository: tributech/website-ui
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  ingress:
+    enabled: true
+    annotations: {}
+    hosts:
+      - host: website.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+  service:
+    port: 4200
+
+  serviceAccount:
+    create: true
+    name: ""
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80

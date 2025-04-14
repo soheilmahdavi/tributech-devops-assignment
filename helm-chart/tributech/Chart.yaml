@@ -1,0 +1,21 @@
+apiVersion: v2
+name: tributech 
+description: Tributech Umbrella Helm Chart
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+dependencies:
+  - name: keycloak
+    version: "15.0.3"
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: postgresql
+    version: "12.1.7"
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: pgadmin4
+    version: "1.5.1"
+    repository: "https://helm.runix.net"
+    alias: pgadmin
+  - name: website
+    version: "0.1.0"
+    repository: "file://charts/website"
