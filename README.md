@@ -52,7 +52,7 @@ Edit /etc/hosts on Windows or macOS to point .local domains to Minikube IP
 
 2. Clone and install dependencies
   ```bash
-  git clone <your-fork-url>
+  git clone https://github.com/soheilmahdavi/tributech-devops-assignment.git
   cd tributech-devops-assignment/helm-chart
   helm dependency update tributech
   ```
