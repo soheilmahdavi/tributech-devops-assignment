@@ -12,17 +12,18 @@ The solution uses a modular, umbrella-style Helm chart with the following subcha
 All services are exposed using Kubernetes Ingress (NGINX) and configured via values.yaml files.
 
 ## Component Interaction
+  ```rust
+  User -> Website -> Keycloak (OAuth)
+                    ↓
+              PostgreSQL
+              (user data)
 
-User -> Website -> Keycloak (OAuth)
-                   ↓
-             PostgreSQL
-             (user data)
-
-Admin -> PGAdmin -> PostgreSQL
+  Admin -> PGAdmin -> PostgreSQL
+  ```
 
 ## Local Setup & Testing
 
-#### Prerequisites
+### Prerequisites
     - Docker
 
     - Minikube or Kind (tested on Minikube 1.29+)
@@ -35,7 +36,7 @@ Admin -> PGAdmin -> PostgreSQL
 
 Edit /etc/hosts on Windows or macOS to point .local domains to Minikube IP
 
-## Example /etc/hosts:
+### Example /etc/hosts:
 
   ```yaml
   192.168.49.2 keycloak-dev.local
@@ -72,23 +73,28 @@ Edit /etc/hosts on Windows or macOS to point .local domains to Minikube IP
 
   - tributech-dev-pgadmin-* – PGAdmin
 
-Test URLs (after updating /etc/hosts):
+#### Test URLs (after updating /etc/hosts):
+
 Component | URL | Notes
+
 Website | http://website.local | Should show sample UI
+
 Keycloak | http://keycloak-dev.local | Login UI (admin user: user)
+
 PGAdmin | http://pgadmin.local | DB management
+
 
 Testing in Tributech Infrastructure
 
 ### Make sure the Kubernetes cluster has:
 
-A running Ingress Controller
+1. A running Ingress Controller
 
-Default namespace or custom one specified
+2. Default namespace or custom one specified
 
-Secrets/Configs handled via values.yaml
+3. Secrets/Configs handled via values.yaml
 
-Deployment Instructions
+### Deployment Instructions
   `helm upgrade --install tributech-dev ./tributech -f tributech/values.yaml --namespace your-namespace`
 
 ### If Ingress controller is already deployed, no changes needed. Otherwise, deploy NGINX ingress:
