@@ -1,105 +1,69 @@
-## Architecture & Design
-The solution uses a modular, umbrella-style Helm chart with the following subcharts:
+## Tools You Need to Install:
+* Docker: 
 
-- Keycloak – Handles authentication. Deployed via the Bitnami Helm chart and configured to use PostgreSQL.
+* Minikube:
 
-- PostgreSQL – A relational database deployed using Bitnami’s PostgreSQL chart and consumed by Keycloak.
+* Kubectl: 
 
-- PGAdmin – Provides a UI to access and manage PostgreSQL.
+* Helm: 
 
-- Website – A Tributech-provided sample application that authenticates users via Keycloak.
-
-All services are exposed using Kubernetes Ingress (NGINX) and configured via values.yaml files.
-
-## Component Interaction
-  ```rust
-  User -> Website -> Keycloak (OAuth)
-                    ↓
-              PostgreSQL
-              (user data)
-
-  Admin -> PGAdmin -> PostgreSQL
-  ```
-
-## Local Setup & Testing
-
-### Prerequisites
-    - Docker
-
-    - Minikube or Kind (tested on Minikube 1.29+)
-
-    - Helm v3+
-
-    - NGINX Ingress Controller installed
-
-    - kubectl and helm CLI tools installed
-
-Edit /etc/hosts on Windows or macOS to point .local domains to Minikube IP
-
-### Example /etc/hosts:
-
-  ```yaml
-  192.168.49.2 keycloak-dev.local
-  192.168.49.2 website.local
-  192.168.49.2 pgadmin.local 
-  ```
-
-1. Start Minikube
-  ```bash
-  minikube start --driver=docker
-  minikube addons enable ingress
-  ```
-
-2. Clone and install dependencies
-  ```bash
-  git clone https://github.com/soheilmahdavi/tributech-devops-assignment.git
-  cd tributech-devops-assignment/helm-chart
-  helm dependency update tributech
-  ```
-
-3. Deploy the stack
-  `helm install tributech-dev ./tributech -f tributech/values.yaml`
-
-4. Validate Components
-  `kubectl get pods -A`
-
-* Expected Pods:
-
-  - tributech-dev-postgresql-0 – PostgreSQL
-
-  - tributech-dev-keycloak-0 – Keycloak
-
-  - tributech-dev-website-* – Sample webapp
-
-  - tributech-dev-pgadmin-* – PGAdmin
-
-#### Test URLs (after updating /etc/hosts):
-
-Component | URL | Notes
-
-Website | http://website.local | Should show sample UI
-
-Keycloak | http://keycloak-dev.local | Login UI (admin user: user)
-
-PGAdmin | http://pgadmin.local | DB management
+* Git:
 
 
-Testing in Tributech Infrastructure
+## Steps to Run the Project Locally:
+1.  Start Minikube:
 
-### Make sure the Kubernetes cluster has:
+```bash
+minikube start --driver=docker
 
-1. A running Ingress Controller
+```
 
-2. Default namespace or custom one specified
+2. Enable Ingress for Minikube:
 
-3. Secrets/Configs handled via values.yaml
+``` bash
+minikube addons enable ingress
+```
+3. Set up the Kubernetes environment variables:
+```bash
+kubectl config use-context minikube
+```
 
-### Deployment Instructions
-  `helm upgrade --install tributech-dev ./tributech -f tributech/values.yaml --namespace your-namespace`
+4. Build the Docker image for the website:
+```bash
+docker build -t tributech-website:local .
+```
 
-### If Ingress controller is already deployed, no changes needed. Otherwise, deploy NGINX ingress:
-  ```bash
-  helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-  helm repo update
-  helm install ingress-nginx ingress-nginx/ingress-nginx
-  ```
+5. Load the Docker image into Minikube:
+```bash
+minikube image load tributech-website:local
+```
+
+
+6. Deploy the application using Helm:
+```bash
+helm upgrade --install tributech ./tributech -f tributech/values.yaml
+```
+
+
+7. Patch the ingress service to LoadBalancer type (it is not set automatically):
+```bash
+kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer"}}'
+```
+
+
+8. Check the status of the pods:
+```bash
+kubectl get pods -A
+```
+
+
+9. Monitor the logs of the website pod:
+```bash
+kubectl logs -f <website_pod_name>
+```
+
+
+10. Access the website by navigating to the provided IP and port:
+```bash
+minikube service tributech-website
+```
