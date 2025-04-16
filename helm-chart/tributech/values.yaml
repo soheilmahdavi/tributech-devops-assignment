@@ -1,24 +1,22 @@
-serviceAccount:
-    create: true
-    name: ""
-
-service:
-    type: ClusterIP
-    port: 80
-
-ingress:
-    enabled: false
-
-autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 80
-
 keycloak:
+  postgresql:
+    enabled: false  # <--- disable the internal subchart
+  externalDatabase:
+    host: tributech-postgresql
+    user: keycloak
+    password: keycloakpassword
+    database: keycloakdb
+  auth:
+    adminUser: admin
+    adminPassword: adminpassword
+    existingSecret: ""
   ingress:
     enabled: true
-    hostname: keycloak-dev.local
+    hostname: keycloak.local
+    ingressClassName: nginx
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    tls: false
 
 postgresql:
   auth:
@@ -27,42 +25,21 @@ postgresql:
     database: keycloakdb
 
 pgadmin:
+  env:
+    email: admin@example.com
+    password: adminpassword
+  service:
+    type: ClusterIP
   ingress:
     enabled: true
-    annotations: {}
+    className: nginx
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/ingress.allow-http: "true"
+      nginx.ingress.kubernetes.io/use-regex: "true"
     hosts:
       - host: pgadmin.local
         paths:
           - path: /
             pathType: Prefix
-  admin:
-    email: admin@example.com
-    password: adminpassword
 
-website:
-  image:
-    repository: tributech/website-ui
-    tag: latest
-    pullPolicy: IfNotPresent
-
-  ingress:
-    enabled: true
-    annotations: {}
-    hosts:
-      - host: website.local
-        paths:
-          - path: /
-            pathType: Prefix
-
-  service:
-    port: 4200
-
-  serviceAccount:
-    create: true
-    name: ""
-
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilizationPercentage: 80
