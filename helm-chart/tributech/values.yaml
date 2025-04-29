@@ -10,13 +10,20 @@ keycloak:
     adminUser: admin
     adminPassword: adminpassword
     existingSecret: ""
+  proxyAddressForwarding: true
+  extraEnv:                    # (or extraEnvVars, depending on chart version)
+    - name: PROXY_ADDRESS_FORWARDING
+      value: "true"
   ingress:
     enabled: true
     hostname: keycloak.local
     ingressClassName: nginx
     annotations:
       kubernetes.io/ingress.class: nginx
-    tls: false
+    tls:                     # <‑‑ NEW
+      - secretName: keycloak-tls
+        hosts:
+          - keycloak.local
 
 postgresql:
   auth:
@@ -42,4 +49,28 @@ pgadmin:
         paths:
           - path: /
             pathType: Prefix
+    tls:
+      - secretName: pgadmin-tls
+        hosts:
+          - pgadmin.local
 
+website:
+  image:
+    repository: tributech-website
+    tag: local
+    pullPolicy: IfNotPresent      # Always if you rebuild a lot
+  service:
+    type: ClusterIP
+    port: 80
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: website.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:                          # <-- NEW
+      - secretName: website-tls   # must match the secret you just created
+        hosts:
+          - website.local
